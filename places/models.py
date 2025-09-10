@@ -12,7 +12,9 @@ class Spot(BaseModel):
     lng         = models.FloatField()
     address     = models.TextField(blank=True)
     city        = models.CharField(max_length=120, blank=True)
+    state       = models.CharField(max_length=120, blank=True)
     country     = models.CharField(max_length=120, default="Nigeria")
+    zipcode     = models.CharField(max_length=8, blank=True)
     price_band  = models.CharField(max_length=8, blank=True)  # ₦ / ₦₦ / ₦₦₦
     tags        = models.JSONField(default=list, blank=True)
     photos      = models.JSONField(default=list, blank=True)  # [{url, by?, at}]
@@ -36,6 +38,9 @@ class Candidate(BaseModel):
     country      = models.CharField(max_length=120, default="Nigeria")
     source_url   = models.URLField(max_length=500, blank=True)
     source_kind  = models.CharField(max_length=40, blank=True)  # blog|directory|social|user|agent
+    price_band = models.CharField(blank=True)
+    photo_url = models.URLField(blank=True)
+    submitted_by_email = models.EmailField(blank=True)
     evidence     = models.JSONField(default=list, blank=True)
     signals      = models.JSONField(default=dict, blank=True)
     score        = models.DecimalField(max_digits=4, decimal_places=3, default=0)  # 0.000..1.000
