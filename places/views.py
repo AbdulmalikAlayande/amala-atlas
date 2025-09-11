@@ -1,11 +1,14 @@
 from json import JSONDecodeError
 
 from django.http import JsonResponse
-from rest_framework import views, status
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import views, status, viewsets, pagination, generics
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 
-from places.serializers import SpotSerializer
+from places.filters import GetSpotsFilter
+from places.models import Spot
+from places.serializers import SpotSerializer, GetSpotSerializer
 
 
 class SpotApiView(views.APIView):
@@ -26,7 +29,7 @@ class SpotApiView(views.APIView):
         try:
             data = JSONParser().parse(request)
             serializer = self.get_serializer(data=data)
-            if serializer.is_valid(raise_exception=True):
+            if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             else:
@@ -34,3 +37,19 @@ class SpotApiView(views.APIView):
         except JSONDecodeError | Exception:
             return JsonResponse({"result": "error","message": "Json decoding error"}, status=status.HTTP_400_BAD_REQUEST)
 
+
+class SpotPagination(pagination.PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 10
+
+
+"""
+
+"""
+class SpotViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Spot.objects.all().order_by("-created_at")
+    serializer_class = GetSpotSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = GetSpotsFilter
+    pagination_class = None

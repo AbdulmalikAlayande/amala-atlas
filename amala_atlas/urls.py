@@ -19,6 +19,9 @@ from django.urls import path, include
 from django.contrib import admin
 from rest_framework import routers
 
+import ingestion.views
+import verification.views
+
 router = routers.DefaultRouter()
 
 urlpatterns = router.urls
@@ -26,4 +29,7 @@ urlpatterns = router.urls
 urlpatterns += [
     path('admin/', admin.site.urls),
     path('spot/', include('places.urls')),
+    path('verify/queue', verification.views.GetVerificationCandidateQueue.as_view()),
+    path('verify/action', verification.views.VerificationActionView.as_view()),
+    path('ingest/', ingestion.views.IngestCandidateView.as_view()),
 ]

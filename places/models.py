@@ -2,10 +2,10 @@ from django.db import models
 
 from commons.models import BaseModel
 from users.models import User
-from django.utils.translation import gettext_lazy as _
 
-
-# Amala Spot
+"""
+Amala Spot
+"""
 class Spot(BaseModel):
     name        = models.CharField(max_length=200)
     lat         = models.FloatField()
@@ -28,7 +28,9 @@ class Spot(BaseModel):
         ]
 
 
-# Prospective Amala Spot
+"""
+Prospective Amala Spot
+"""
 class Candidate(BaseModel):
     name         = models.CharField(max_length=200)
     raw_address  = models.TextField(blank=True)
@@ -38,8 +40,9 @@ class Candidate(BaseModel):
     country      = models.CharField(max_length=120, default="Nigeria")
     source_url   = models.URLField(max_length=500, blank=True)
     source_kind  = models.CharField(max_length=40, blank=True)  # blog|directory|social|user|agent
-    price_band = models.CharField(blank=True)
-    photo_url = models.URLField(blank=True)
+    price_band = models.CharField(max_length=8, blank=True)
+    photo_url    = models.URLField(blank=True)
+    open_hours  = models.JSONField(null=True, blank=True)
     submitted_by_email = models.EmailField(blank=True)
     evidence     = models.JSONField(default=list, blank=True)
     signals      = models.JSONField(default=dict, blank=True)
@@ -56,25 +59,10 @@ class Candidate(BaseModel):
         ordering = ["-score"]
 
 
-# A verification to qualify a `Candidate` as a `Spot`
-class Verification(BaseModel):
-
-    class Actions(models.TextChoices):
-        APPROVE = "approve", _("Approve")
-        REJECT = "reject", _("Reject")
-        MERGE = "merge", _("Merge")
-        EDIT = "edit", _("Edit")
-
-    candidate   = models.ForeignKey(Candidate, on_delete=models.CASCADE, related_name="verifications")
-    action      = models.CharField(choices= Actions.choices, max_length=10)
-    notes       = models.TextField(blank=True)
-    by_user  = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-
-
-
-# V2 - Submission (To Preserve raw user/agent form separate from Candidate)
-# class Submission(BaseModel):
-#     id (PK)
-#     payload (jsonb) ⟶ the unprocessed body
-#     candidate_id? (FK) ⟶ link once normalized
-#     submitted_by_email? (text)
+"""
+Submission (To Preserve raw user/agent form separate from Candidate
+"""
+class Submission(BaseModel):
+    payload = models.JSONField(blank=True)
+    candidate = models.ForeignKey(Candidate, on_delete=models.CASCADE)
+    submitted_by = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
