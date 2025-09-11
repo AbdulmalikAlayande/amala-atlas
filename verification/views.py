@@ -9,13 +9,14 @@ from places.models import Candidate, Spot
 from verification.models import Verification
 from verification.serializers import VerificationSerializer, CandidateQueueSerializer, VerificationActionSerializer
 
-VERIFICATION_LENGTH = 2
+APPROVE_THRESHOLD = 2
+REJECT_THRESHOLD  = 3
 
 logger = logging.getLogger(__name__)
 
 
 """
-
+List candidates pending verification, highest score first.
 """
 class GetVerificationCandidateQueue(ListAPIView):
 
@@ -56,12 +57,31 @@ class VerificationActionView(generics.CreateAPIView):
 
         candidate: Candidate = get_object_or_404(Candidate.objects.select_for_update(), pk=candidate_id)
 
+        user = getattr(request, "user", None)
+        if user and not getattr(user, "is_authenticated", False):
+            user = None
+
+        existing_q = candidate.verifications
+        if user:
+            existing_q = existing_q.filter(by_user=user)
+        else:
+            existing_q = existing_q.filter(by_user__isnull=True)
+
+        value = existing_q.first()
+        if value:
+            value.action = action
+            value.notes = notes
+            value.save(update_fields=["action", "notes"])
+        else:
+            Verification.objects.create(candidate=candidate, action=action, notes=notes, by_user=user)
+
         Verification.objects.create(candidate=candidate, action=action, notes=notes)
 
+        approvals = candidate.verifications.filter(action=Verification.Actions.APPROVE).count()
+        rejects = candidate.verifications.filter(action=Verification.Actions.REJECT).count()
+
         if action == Verification.Actions.APPROVE:
-            # At least 5 users must verify the candidate before it becomes a spot
-            approvals = candidate.verifications.filter(action=Verification.Actions.APPROVE).count()
-            if approvals >= VERIFICATION_LENGTH and candidate.status != "approved":
+            if approvals >= APPROVE_THRESHOLD and candidate.status != "approved":
                 Spot.objects.create(
                     name=candidate.name, lat=candidate.lat or 0.0, lng=candidate.lng or 0.0,
                     address=candidate.raw_address or "", city=candidate.city, country=candidate.country,
@@ -74,14 +94,10 @@ class VerificationActionView(generics.CreateAPIView):
                 return Response({"ok": True}, status=status.HTTP_201_CREATED, )
 
         if action == Verification.Actions.REJECT:
-            # We cannot just set the candidate, Why?
-            # Because multiple users will verify the candidate
-            # Verification can either be rejection, approval, merge or edit
-            # Merge and edit verifications are user specific
-            # They can only be done on verifications the specific user added not other user's
-            # Rejection cannot just happen like that
-            # It has to reach at least 10 users rejection before the verification is finally rejected
-            return Response({"ok": True, "message": "Candidate Rejected"}, status=status.HTTP_200_OK)
+            if rejects >= REJECT_THRESHOLD and candidate.status != "rejected":
+                candidate.status = "rejected"
+                candidate.save(update_fields=["status"])
+            return Response({"ok": True, "rejections": rejects, "message": "Candidate Rejected"}, status=status.HTTP_200_OK)
 
         return Response({"error": "unknown action"}, status=400)
 
