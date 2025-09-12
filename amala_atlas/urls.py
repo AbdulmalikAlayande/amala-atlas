@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
-from django.urls import path, include
+from django.urls import path
 from django.contrib import admin
 from rest_framework import routers
 
@@ -29,7 +29,7 @@ urlpatterns = router.urls
 
 urlpatterns += [
     path('admin/', admin.site.urls),
-    path('spot/', include('places.urls')),
+    # Not an endpoint, just for learning:: path('spot/create-spot', places.views.SpotApiView.as_view()),
     path('verify/queue/', verification.views.GetVerificationCandidateQueue.as_view()),
     path('verify/action/', verification.views.VerificationActionView.as_view()),
     path('ingest/', ingestion.views.IngestCandidateView.as_view()),
