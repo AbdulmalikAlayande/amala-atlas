@@ -63,6 +63,27 @@ class Candidate(BaseModel):
 Submission (To Preserve raw user/agent form separate from Candidate
 """
 class Submission(BaseModel):
-    payload = models.JSONField(blank=True)
-    candidate = models.ForeignKey(Candidate, on_delete=models.CASCADE)
-    submitted_by = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+
+    class Kind(models.TextChoices):
+        MANUAL = "manual", "Manual"
+        AGENTIC = "agentic", "Agentic"
+
+    name = models.CharField(max_length=200, blank=False, null=False)
+    kind = models.CharField(max_length=16, choices=Kind.choices, default=Kind.MANUAL)
+    address = models.TextField(blank=True)
+    city = models.CharField(max_length=120, blank=True)
+    state = models.CharField(max_length=120, blank=True)
+    country = models.CharField(max_length=120, default="Nigeria")
+    lat = models.FloatField(null=True, blank=True)
+    lng = models.FloatField(null=True, blank=True)
+    price_band = models.CharField(max_length=8, blank=True)
+    tags = models.JSONField(default=list, blank=True)
+    hours_text = models.CharField(max_length=200, blank=True)
+    email = models.EmailField(blank=True)
+    photo_url = models.URLField(max_length=500, blank=True)
+    submitted_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name="submissions")
+    transcript = models.TextField(blank=True)
+    raw_payload = models.JSONField(default=dict, blank=True)
+
+    def __str__(self):
+        return f"{self.name} / {self.city} ({self.kind})"

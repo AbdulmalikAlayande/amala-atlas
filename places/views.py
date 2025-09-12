@@ -5,10 +5,12 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import views, status, viewsets, pagination, generics
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
+from rest_framework.status import HTTP_201_CREATED
 
 from places.filters import GetSpotsFilter
-from places.models import Spot
-from places.serializers import SpotSerializer, GetSpotSerializer
+from places.models import Spot, Submission, Candidate
+from places.serializers import SpotSerializer, GetSpotSerializer, CandidateSubmissionSerializer
+from places.services import create_candidate_from_submission
 
 
 class SpotApiView(views.APIView):
@@ -53,3 +55,26 @@ class SpotViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_class = GetSpotsFilter
     pagination_class = None
+
+
+"""
+Accepts both manual and agentic submissions.
+- Saves a Submission row (audit)
+- Creates a Candidate with status=pending_verification
+"""
+class CandidateSubmissionView(generics.CreateAPIView):
+
+    serializer_class = CandidateSubmissionSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        submission: Submission = serializer.save(submitted_by=request.user if getattr(request, 'user', None) and request.user.is_authenticated else None)
+        candidate: Candidate = create_candidate_from_submission(submission)
+
+        return Response(
+            {
+                "ok": True, "candidate_id": candidate.public_id,
+                "status": candidate.status, "score":candidate.score
+            }, status=HTTP_201_CREATED)
