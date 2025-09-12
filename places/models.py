@@ -21,6 +21,19 @@ class Spot(BaseModel):
     open_hours  = models.JSONField(null=True, blank=True)
     source      = models.CharField(max_length=20, default="verified")
 
+    def __str__(self):
+        return f"""
+        Model Spot
+        ============
+        Name:       {self.name}
+        Latitude:   {self.lat}
+        Longitude:  {self.lng}
+        City:       {self.city}
+        Country:    {self.country}
+        Price Band: {self.price_band}
+        tags:       {self.tags}
+        Address:    {self.address}
+        """
     class Meta:
         indexes = [
             models.Index(fields=["city"]),
@@ -51,6 +64,16 @@ class Candidate(BaseModel):
     geo_precision= models.CharField(max_length=20, blank=True)  # address|poi|city
     status       = models.CharField(max_length=30, default="pending_verification")
 
+    def __str__(self):
+        return f"""
+        Model Candidate
+        ===============
+        Name:       {self.name}
+        Latitude:   {self.lat}
+        Longitude:  {self.lng}
+        City:       {self.city}
+        Country:    {self.country}
+        """
     class Meta:
         indexes = [
             models.Index(fields=["status","-score"]),
@@ -86,4 +109,10 @@ class Submission(BaseModel):
     raw_payload = models.JSONField(default=dict, blank=True)
 
     def __str__(self):
-        return f"{self.name} / {self.city} ({self.kind})"
+        return f"""
+        Model Submission
+        ================
+        Name:       {self.name}
+        City:       {self.city} 
+        Kind:       {self.kind}
+        """
