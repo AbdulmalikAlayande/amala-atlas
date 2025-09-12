@@ -24,6 +24,8 @@ import places.views
 import verification.views
 
 router = routers.DefaultRouter()
+router.register(r'spots', places.views.SpotViewSet)
+
 
 urlpatterns = router.urls
 
