@@ -6,6 +6,7 @@ from rest_framework import views, status, viewsets, pagination, generics
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED
+from django.views import View
 
 from places import services
 from places.filters import GetSpotsFilter
@@ -78,3 +79,8 @@ class CandidateSubmissionView(generics.CreateAPIView):
                 "ok": True, "candidate_id": candidate.public_id,
                 "status": candidate.status, "score":candidate.score
             }, status=HTTP_201_CREATED)
+
+
+class HealthCheckView(View):
+    def get(self, request):
+        return JsonResponse({"status": "active"}, status=200)
