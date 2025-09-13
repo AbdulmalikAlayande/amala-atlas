@@ -38,9 +38,11 @@ INSTALLED_APPS = [
     'django_extensions.apps.DjangoExtensionsConfig',
     'django_filters',
     'rest_framework.apps.RestFrameworkConfig',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -105,6 +107,13 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+CORS_ALLOWED_ORIGINS = [
+      "http://localhost:3000",
+      "https://amalaatlas.vercel.app",
+  ]
+
+CORS_ALLOW_ALL_ORIGINS = False
 
 
 # Internationalization
