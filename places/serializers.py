@@ -7,13 +7,13 @@ from .models import Submission
 class SpotSerializer(serializers.ModelSerializer):
     class Meta:
         models = models.Spot
-        fields = ('name', 'address', 'city', 'state', 'lat', 'lng')
+        fields = ('id', 'public_id', 'created_at', 'last_modified_at', 'name', 'address', 'city', 'state', 'lat', 'lng')
 
 class GetSpotSerializer(serializers.ModelSerializer):
     class Meta:
-        models = models.Spot
+        model = models.Spot
         fields = (
-            'name', 'address', 'city', 'state', 'lat', 'lng', 'country',
+            'id', 'public_id', 'created_at', 'last_modified_at', 'name', 'address', 'city', 'state', 'lat', 'lng', 'country',
             'zipcode', 'price_band', 'tags', 'photos', 'open_hours', 'source'
         )
 
@@ -23,7 +23,7 @@ class CandidateSubmissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Submission
         fields = (
-            "kind", "name", "address", "city", "country", "lat", "lng", "price_band",
+            'id', 'public_id', 'created_at', 'last_modified_at', "kind", "name", "address", "city", "country", "lat", "lng", "price_band",
             "tags", "hours_text", "email", "photo_url", "transcript", "raw_payload"
         )
 
