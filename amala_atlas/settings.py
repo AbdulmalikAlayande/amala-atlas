@@ -2,6 +2,8 @@ from pathlib import Path
 
 from amala_atlas.environment import ENV
 
+import dj_database_url
+import os
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -69,11 +71,18 @@ WSGI_APPLICATION = 'amala_atlas.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=os.environ.get("DATABASE_URL")
+    )
 }
 
 AUTH_USER_MODEL = 'users.User'
