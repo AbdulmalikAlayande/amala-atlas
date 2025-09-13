@@ -17,7 +17,7 @@ class GetSpotSerializer(serializers.ModelSerializer):
             'zipcode', 'price_band', 'tags', 'photos', 'open_hours', 'source'
         )
 
-class CandidateSubmissionSerializer(serializers.Serializer):
+class CandidateSubmissionSerializer(serializers.ModelSerializer):
     kind = serializers.ChoiceField(choices=Submission.Kind.choices, default=Submission.Kind.MANUAL)
 
     class Meta:
