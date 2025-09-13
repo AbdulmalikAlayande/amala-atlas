@@ -14,7 +14,9 @@ SECRET_KEY = ENV.str("SECRET_KEY")
 
 DEBUG = ENV.bool("DEBUG", "False")
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["amala-atlas.onrender.com", "localhost", "127.0.0.1"]
+
 
 
 # Application definition
