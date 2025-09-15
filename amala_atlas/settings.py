@@ -16,6 +16,7 @@ DEBUG = ENV.bool("DEBUG", "False")
 
 # ALLOWED_HOSTS = []
 ALLOWED_HOSTS = ["amala-atlas.onrender.com", "localhost", "127.0.0.1"]
+CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000", "https://amalatlas.vercel.app"]
 
 
 
@@ -105,7 +106,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
