@@ -16,6 +16,7 @@ DEBUG = ENV.bool("DEBUG", "False")
 
 # ALLOWED_HOSTS = []
 ALLOWED_HOSTS = ["amala-atlas.onrender.com", "localhost", "127.0.0.1"]
+CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000", "https://amalatlas.vercel.app"]
 
 
 
@@ -81,8 +82,6 @@ WSGI_APPLICATION = 'amala_atlas.wsgi.application'
 #         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
-
-
 DATABASES = {
     'default': dj_database_url.config(
         default=os.environ.get("DATABASE_URL")
@@ -107,14 +106,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
-CORS_ALLOWED_ORIGINS = [
-      "http://localhost:3000",
-      "https://amalaatlas.vercel.app",
-  ]
-
-CORS_ALLOW_ALL_ORIGINS = False
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
