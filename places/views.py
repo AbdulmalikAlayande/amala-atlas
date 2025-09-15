@@ -80,13 +80,13 @@ class CandidateSubmissionView(generics.CreateAPIView):
         print("Serializer valid data values", serializer.validated_data.values())
         print("Serializer valid data values type", type(serializer.validated_data))
         print("Serializer valid data values type", type(serializer.validated_data.values()))
-        # photo_urls = serializer.validated_data["photo_urls"]
-        #
-        # if (not submission.photo_urls.exists() or submission.photo_urls.count() == 0) and photo_urls:
-        #     for url in photo_urls:
-        #         PhotoURL.objects.create(url=url, content_object=submission)
-        #
-        candidate: Candidate = services.create_candidate_from_submission(submission)
+        photo_urls = serializer.validated_data["photo_urls"]
+
+        if (not submission.photo_urls.exists() or submission.photo_urls.count() == 0) and photo_urls:
+            for url in photo_urls:
+                PhotoURL.objects.create(url=url, content_object=submission)
+
+        candidate: Candidate = services.create_candidate_from_submission(submission, photo_urls=photo_urls)
 
         return Response(
             {

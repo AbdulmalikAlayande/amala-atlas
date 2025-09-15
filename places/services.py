@@ -2,7 +2,7 @@
 import logging
 from typing import Dict, Any, Tuple
 
-from places.models import Submission, Candidate
+from places.models import Submission, Candidate, PhotoURL
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -39,7 +39,7 @@ def make_dedupe_key(name: str | None, lat: float | None, lng: float | None) -> s
     return f"name:{norm}"
 
 
-def create_candidate_from_submission(sub: Submission) -> Candidate:
+def create_candidate_from_submission(sub: Submission, photo_urls) -> Candidate:
     lat, lng, precision = geocode_if_needed(sub)
     signals = compute_signals(sub)
     score   = compute_score(signals)
@@ -68,4 +68,9 @@ def create_candidate_from_submission(sub: Submission) -> Candidate:
         geo_precision=precision,
         status="pending_verification",
     )
+
+    if not sub.photo_urls.exists() or sub.photo_urls.count() > 0:
+        for url in photo_urls:
+            PhotoURL.objects.create(url=url, content_object=candidate)
+
     return candidate
