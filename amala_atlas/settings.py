@@ -82,7 +82,6 @@ DATABASES = {
     }
 }
 
-
 # DATABASES = {
 #     'default': dj_database_url.config(
 #         default=os.environ.get("DATABASE_URL")
@@ -108,12 +107,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-CORS_ALLOWED_ORIGINS = [
-      "http://localhost:3000",
-      "https://amalaatlas.vercel.app",
-  ]
-
-CORS_ALLOW_ALL_ORIGINS = True
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
