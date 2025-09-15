@@ -1,9 +1,14 @@
 from rest_framework import serializers
 
-from places.models import Candidate
+from places.models import Candidate, PhotoURL, Submission
 from . import models
 from .models import Verification
 
+class PhotoURLSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PhotoURL
+        fields = ['id', 'url']
 
 class VerificationSerializer(serializers.ModelSerializer):
     candidate_id = serializers.CharField(source="candidate.id")
@@ -11,7 +16,7 @@ class VerificationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Verification
-        fields = ('candidate', 'action', 'notes')
+        fields = ('candidate', 'action', 'notes', 'by_user', 'created_at', 'last_modified_at')
         read_only_fields = ("id", "public_id", "created_at")
 
 
@@ -23,6 +28,10 @@ class VerificationActionSerializer(serializers.Serializer):
 
 
 class CandidateQueueSerializer(serializers.ModelSerializer):
+    kind = serializers.ChoiceField(choices=Submission.Kind.choices, default=Submission.Kind.MANUAL)
+    photo_urls = PhotoURLSerializer(many=True, read_only=True)
+
     class Meta:
         model  = Candidate
-        fields = ("id","name","city","score","source_kind","evidence","signals","lat","lng","raw_address")
+        fields = ("id","name","city", "state", "country", "score","source_kind","evidence", "photo_urls",
+                  "price_band", "tags", "phone", "kind", "email", "website", "signals","lat","lng","raw_address")

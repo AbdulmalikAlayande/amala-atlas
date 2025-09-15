@@ -1,3 +1,4 @@
+import logging
 from json import JSONDecodeError
 
 from django.http import JsonResponse
@@ -10,9 +11,11 @@ from django.views import View
 
 from places import services
 from places.filters import GetSpotsFilter
-from places.models import Spot, Submission, Candidate
+from places.models import Spot, Submission, Candidate, PhotoURL
 from places.serializers import SpotSerializer, GetSpotSerializer, CandidateSubmissionSerializer
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 class SpotApiView(views.APIView):
     serializer_class = SpotSerializer
@@ -72,6 +75,17 @@ class CandidateSubmissionView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
 
         submission: Submission = serializer.save(submitted_by=request.user if getattr(request, 'user', None) and request.user.is_authenticated else None)
+
+        print("Serializer valid data", serializer.validated_data)
+        print("Serializer valid data values", serializer.validated_data.values())
+        print("Serializer valid data values type", type(serializer.validated_data))
+        print("Serializer valid data values type", type(serializer.validated_data.values()))
+        # photo_urls = serializer.validated_data["photo_urls"]
+        #
+        # if (not submission.photo_urls.exists() or submission.photo_urls.count() == 0) and photo_urls:
+        #     for url in photo_urls:
+        #         PhotoURL.objects.create(url=url, content_object=submission)
+        #
         candidate: Candidate = services.create_candidate_from_submission(submission)
 
         return Response(
@@ -83,4 +97,5 @@ class CandidateSubmissionView(generics.CreateAPIView):
 
 class HealthCheckView(View):
     def get(self, request):
+        logger.info(f"GET {request.path}")
         return JsonResponse({"status": "active"}, status=200)

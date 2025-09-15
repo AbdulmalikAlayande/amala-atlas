@@ -1,8 +1,11 @@
 # TODO: To inject a city-centroid geocoder later
+import logging
 from typing import Dict, Any, Tuple
 
 from places.models import Submission, Candidate
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 def geocode_if_needed(sub: Submission) -> Tuple[float | None, float | None, str]:
     if sub.lat is not None and sub.lng is not None:
@@ -17,7 +20,7 @@ def compute_signals(sub: Submission) -> Dict[str, Any]:
             hits += 1
     return {
         "keyword_hits": hits,
-        "has_photo": bool(sub.photo_url),
+        "has_photo": bool(sub.photo_urls),
         "has_coords": sub.lat is not None and sub.lng is not None,
     }
 
@@ -40,18 +43,25 @@ def create_candidate_from_submission(sub: Submission) -> Candidate:
     lat, lng, precision = geocode_if_needed(sub)
     signals = compute_signals(sub)
     score   = compute_score(signals)
-
+    logger.info(f"Photo URLs: {sub.photo_urls}")
+    print("Photo URLS", sub.photo_urls)
     candidate = Candidate.objects.create(
         name=sub.name,
         raw_address=sub.address or "",
         city=sub.city,
+        state=sub.state or "",
         country=sub.country or "Nigeria",
         lat=lat,
         lng=lng,
+        tags=sub.tags,
+        hours_text = sub.hours_text,
+        phone = sub.phone or "Not Available",
+        website = sub.website or "Not Available",
+        email = sub.email or "Not Available",
         price_band=sub.price_band or "",
         source_url="",
         source_kind="user",
-        evidence=[{"kind": "user_submit", "photo_url": sub.photo_url}] if sub.photo_url else [],
+        evidence=[{"kind": "user_submit", "photo_url": [{"url": photo_url.url} for photo_url in sub.photo_urls.all()]}] if sub.photo_urls.exists() else [],
         signals=signals,
         score=score,
         dedupe_key=make_dedupe_key(sub.name, lat, lng),
